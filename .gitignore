@@ -1,0 +1,10 @@
+/jobhunter
+/jobhunter.exe
+/dist/
+/output/
+profile.txt
+.env
+*.exe
+coverage.out
+.DS_Store
+/agent-tools/
