@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cryk/jobhunter/internal/job"
-	"github.com/cryk/jobhunter/internal/openrouter"
+	"github.com/Crykk/JobHunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/openrouter"
 )
 
 type fakeChat struct {

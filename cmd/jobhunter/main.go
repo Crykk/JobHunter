@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/cryk/jobhunter/internal/cli"
+	"github.com/Crykk/JobHunter/internal/cli"
 )
 
 var (

@@ -2,6 +2,8 @@
 
 A terminal command: after install you type `jobhunter`. It searches [Duunitori](https://duunitori.fi/tyopaikat) from **your** IP, filters listings with OpenRouter Luna Decisions, then ranks survivors with Gemini 4 Argon.
 
+Agents and contributors: read [AGENTS.md](AGENTS.md) for what/how/why and constraints.
+
 Install is **one line**. No Node or Python runtime.
 
 ## Install
@@ -9,13 +11,13 @@ Install is **one line**. No Node or Python runtime.
 Windows (PowerShell):
 
 ```powershell
-irm https://raw.githubusercontent.com/cryk/jobhunter/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/Crykk/JobHunter/main/install.ps1 | iex
 ```
 
 macOS / Linux:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/cryk/jobhunter/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Crykk/JobHunter/main/install.sh | sh
 ```
 
 The scripts download the matching GitHub Release binary onto PATH (`%LOCALAPPDATA%\jobhunter` on Windows, `~/.local/bin` on Unix). Until a release exists, they fall back to `go install` when Go is on PATH.
@@ -23,13 +25,13 @@ The scripts download the matching GitHub Release binary onto PATH (`%LOCALAPPDAT
 Override the GitHub repo if you forked:
 
 ```bash
-JOBHUNTER_REPO=you/jobhunter curl -fsSL https://raw.githubusercontent.com/you/jobhunter/main/install.sh | sh
+JOBHUNTER_REPO=you/JobHunter curl -fsSL https://raw.githubusercontent.com/you/JobHunter/main/install.sh | sh
 ```
 
 Or, with Go installed:
 
 ```bash
-go install github.com/cryk/jobhunter/cmd/jobhunter@latest
+go install github.com/Crykk/JobHunter/cmd/jobhunter@latest
 ```
 
 ## Setup

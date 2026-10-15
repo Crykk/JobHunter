@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/cryk/jobhunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/job"
 )
 
 // Table writes a ranked table to stdout.

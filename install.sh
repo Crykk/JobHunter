@@ -3,9 +3,9 @@
 # Usage: curl -fsSL https://raw.githubusercontent.com/<org>/jobhunter/main/install.sh | sh
 set -eu
 
-REPO="${JOBHUNTER_REPO:-cryk/jobhunter}"
+REPO="${JOBHUNTER_REPO:-Crykk/JobHunter}"
 INSTALL_DIR="${JOBHUNTER_INSTALL_DIR:-${HOME}/.local/bin}"
-MODULE="${JOBHUNTER_MODULE:-github.com/cryk/jobhunter/cmd/jobhunter}"
+MODULE="${JOBHUNTER_MODULE:-github.com/Crykk/JobHunter/cmd/jobhunter}"
 BIN_NAME="jobhunter"
 
 os=$(uname -s)

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/cryk/jobhunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/job"
 )
 
 const pageSize = 20

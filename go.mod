@@ -1,4 +1,4 @@
-module github.com/cryk/jobhunter
+module github.com/Crykk/JobHunter
 
 go 1.22
 

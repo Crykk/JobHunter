@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/cryk/jobhunter/internal/job"
-	"github.com/cryk/jobhunter/internal/openrouter"
+	"github.com/Crykk/JobHunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/openrouter"
 )
 
 // MaxQuestions is kept under the Decisions cap of 200 (plan: ~100 per call).

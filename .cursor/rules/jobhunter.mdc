@@ -1,0 +1,10 @@
+---
+description: JobHunter CLI constraints for local agents
+alwaysApply: true
+---
+
+JobHunter is a Go CLI (not a web app). Read `AGENTS.md` and `README.md` before editing.
+
+Keep: plain HTTP scraper, two OpenRouter stages (Luna Decisions then Gemini 4 Argon), `profile.txt`, install via `install.ps1` / `install.sh`, MIT + Duunitori ToS/`robots.txt` disclaimer.
+
+Do not add a headless browser, a proxy provider, live Duunitori calls in tests, or commit secrets / real `profile.txt`.

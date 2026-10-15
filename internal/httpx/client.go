@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cryk/jobhunter/internal/parse"
+	"github.com/Crykk/JobHunter/internal/parse"
 )
 
 // BrowserUA is a desktop Chrome UA so Duunitori serves the HTML card markup.

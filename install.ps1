@@ -2,9 +2,9 @@
 # Usage: irm https://raw.githubusercontent.com/<org>/jobhunter/main/install.ps1 | iex
 $ErrorActionPreference = "Stop"
 
-$Repo = if ($env:JOBHUNTER_REPO) { $env:JOBHUNTER_REPO } else { "cryk/jobhunter" }
+$Repo = if ($env:JOBHUNTER_REPO) { $env:JOBHUNTER_REPO } else { "Crykk/JobHunter" }
 $InstallDir = if ($env:JOBHUNTER_INSTALL_DIR) { $env:JOBHUNTER_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA "jobhunter" }
-$Module = if ($env:JOBHUNTER_MODULE) { $env:JOBHUNTER_MODULE } else { "github.com/cryk/jobhunter/cmd/jobhunter" }
+$Module = if ($env:JOBHUNTER_MODULE) { $env:JOBHUNTER_MODULE } else { "github.com/Crykk/JobHunter/cmd/jobhunter" }
 
 switch ($env:PROCESSOR_ARCHITECTURE) {
     "AMD64" { $Arch = "x86_64" }

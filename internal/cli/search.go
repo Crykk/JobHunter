@@ -10,13 +10,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/cryk/jobhunter/internal/filter"
-	"github.com/cryk/jobhunter/internal/httpx"
-	"github.com/cryk/jobhunter/internal/job"
-	"github.com/cryk/jobhunter/internal/openrouter"
-	"github.com/cryk/jobhunter/internal/output"
-	"github.com/cryk/jobhunter/internal/rank"
-	"github.com/cryk/jobhunter/internal/scraper"
+	"github.com/Crykk/JobHunter/internal/filter"
+	"github.com/Crykk/JobHunter/internal/httpx"
+	"github.com/Crykk/JobHunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/openrouter"
+	"github.com/Crykk/JobHunter/internal/output"
+	"github.com/Crykk/JobHunter/internal/rank"
+	"github.com/Crykk/JobHunter/internal/scraper"
 )
 
 type searchOpts struct {

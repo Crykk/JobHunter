@@ -33,7 +33,7 @@ func New(apiKey string) *Client {
 		HTTP:    &http.Client{Timeout: 120 * time.Second},
 		BaseURL: DefaultBaseURL,
 		APIKey:  apiKey,
-		Referer: "https://github.com/cryk/jobhunter",
+		Referer: "https://github.com/Crykk/JobHunter",
 		Title:   "JobHunter",
 	}
 }

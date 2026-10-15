@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/cryk/jobhunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/job"
 )
 
 var htmlTagRe = regexp.MustCompile(`(?s)<[^>]+>`)

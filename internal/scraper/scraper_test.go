@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cryk/jobhunter/internal/httpx"
-	"github.com/cryk/jobhunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/httpx"
+	"github.com/Crykk/JobHunter/internal/job"
 )
 
 func fixture(name string) []byte {

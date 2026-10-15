@@ -6,9 +6,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/cryk/jobhunter/internal/httpx"
-	"github.com/cryk/jobhunter/internal/job"
-	"github.com/cryk/jobhunter/internal/parse"
+	"github.com/Crykk/JobHunter/internal/httpx"
+	"github.com/Crykk/JobHunter/internal/job"
+	"github.com/Crykk/JobHunter/internal/parse"
 )
 
 // Fetcher is the HTTP surface used by the scraper (real client or httptest).
