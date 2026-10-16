@@ -20,8 +20,8 @@ This Project also has a private Origin copy; GitHub is the public home.
 
 - **Go, single binary** — install with `irm | iex` / `curl | sh` and no Node/Python runtime.
 - **User’s own IP** — Duunitori often Cloudflare-challenges datacenter and non-FI IPs. No bundled proxy. Honor `HTTP_PROXY`/`HTTPS_PROXY` if the user sets them. Fail 403/429/CF HTML with a clear “run from a Finnish/Nordic home IP” error; **do not** solve Cloudflare challenges.
-- **Two AI stages** — list pages are large and cheap to filter; full HTML is expensive. Stage 1 is OpenRouter Decisions: `openai/gpt-6-luna-decisions` or `typesafe/jev-1.14` (TUI Settings). Stage 2 is `google/gemini-4-argon` (chat JSON: score + why). One OpenRouter key, no local models. The TUI asks you to paste the key if missing; env `OPENROUTER_API_KEY` overrides. Persist models + key in `jobhunter.settings.json` (gitignored).
-- **`profile.txt`** — created on first run in the app data dir (`%LOCALAPPDATA%\jobhunter` / `~/.local/share/jobhunter`) from `profile.example.txt`. `./profile.txt` wins if present. TUI Settings opens it in the OS editor. Gitignore local copies; commit only `profile.example.txt`.
+- **Two AI stages** — list pages are large and cheap to filter; full HTML is expensive. Stage 1 is OpenRouter Decisions: `openai/gpt-6-luna-decisions` or `typesafe/jev-1.14` (TUI Settings). Stage 2 is `google/gemini-4-argon` (chat JSON: score + why). One OpenRouter key, no local models. The TUI asks you to paste the key if missing; env `OPENROUTER_API_KEY` overrides. Persist models + key in the app data `jobhunter.settings.json` (gitignored). Install/upgrade replaces only the binary; never overwrite that file or `profile.txt`.
+- **`profile.txt`** — created on first run in the app data dir (`%LOCALAPPDATA%\jobhunter` / `~/.local/share/jobhunter`) from `profile.example.txt` if missing. `./profile.txt` wins if present. TUI Settings opens it in the OS editor. Gitignore local copies; commit only `profile.example.txt`.
 - **robots.txt** — Duunitori `User-agent: *` / `Disallow: /`. Keep the README disclaimer. Do not add aggressive parallelism or unlimited crawl.
 
 ## How it is implemented
@@ -32,7 +32,7 @@ This Project also has a private Origin copy; GitHub is the public home.
 | `internal/cli` | Cobra root (TUI on TTY) + `search` (`--query`, `--area`, `--pages`, `--threshold`, `--profile`, `--out`) |
 | `internal/pipeline` | Shared Duunitori → Luna → Argon run (CLI + TUI) |
 | `internal/tui` | Bubble Tea UI in the current tab (mouse, menu, settings, results) |
-| `internal/settings` | `jobhunter.settings.json` — first-pass Luna/Jev, second-pass Argon, optional API key |
+| `internal/settings` | App-data `jobhunter.settings.json` — first-pass Luna/Jev, second-pass Argon, optional API key |
 | `internal/profile` | Create/open `profile.txt` (app data dir + Settings) |
 | `internal/httpx` | `net/http` client, ~0.8s delay, browser-like User-Agent |
 | `internal/scraper` | Search pagination (`sivu=`, 20/page) and detail fetch |

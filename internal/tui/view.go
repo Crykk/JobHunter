@@ -54,6 +54,18 @@ func (m model) menuStartY() int {
 	return padTop + 4
 }
 
+// homeInputsStartY is the query row under the box (status, optional error, then a blank).
+func (m model) homeInputsStartY() int {
+	y := padTop + m.boxHeight() + 2
+	if m.errMsg != "" {
+		y++
+	}
+	return y + 1
+}
+
+func (m model) homeQueryY() int { return m.homeInputsStartY() }
+func (m model) homeAreaY() int  { return m.homeInputsStartY() + 1 }
+
 func (m model) resultStartY() int {
 	// skip Results title, count, blank — same offset as menuStartY content block
 	return m.menuStartY() + 3
@@ -157,8 +169,9 @@ func (m model) View() string {
 		b.WriteString(pad + lipgloss.NewStyle().Foreground(colHint).Render("←/→ models  a api key  e editor  f folder  esc back") + "\n")
 	} else if m.screen != screenResults && m.screen != screenRunning {
 		b.WriteString("\n")
-		b.WriteString(pad + m.query.View() + "  " + m.area.View() + "\n")
-		b.WriteString(pad + lipgloss.NewStyle().Foreground(colHint).Render("enter search  tab area  click menu  ctrl+q quit") + "\n")
+		b.WriteString(pad + m.query.View() + "\n")
+		b.WriteString(pad + m.area.View() + "\n")
+		b.WriteString(pad + lipgloss.NewStyle().Foreground(colHint).Render("enter search  click or tab location  click menu  ctrl+q quit") + "\n")
 	} else if m.screen == screenResults {
 		b.WriteString(pad + lipgloss.NewStyle().Foreground(colHint).Render("↑↓ select  enter/click open  esc home  ctrl+q quit") + "\n")
 	} else {

@@ -3,12 +3,14 @@ package settings
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/Crykk/JobHunter/internal/openrouter"
+	"github.com/Crykk/JobHunter/internal/profile"
 )
 
-// DefaultFile is the working-directory settings JSON (gitignored).
+// DefaultFile is the settings JSON name (gitignored; lives in the app data dir).
 const DefaultFile = "jobhunter.settings.json"
 
 // File is persisted model choices and optional API key (gitignored).
@@ -26,9 +28,46 @@ func Default() File {
 	}
 }
 
-// Load reads DefaultFile, or Default if missing/invalid.
+// Path is the local settings file. Upgrades replace only the binary, not this file.
+func Path() string {
+	if p := strings.TrimSpace(os.Getenv("JOBHUNTER_SETTINGS")); p != "" {
+		return p
+	}
+	return filepath.Join(profile.Dir(), DefaultFile)
+}
+
+// Load reads Path(), or Default if missing/invalid.
 func Load() File {
-	return LoadPath(DefaultFile)
+	p := Path()
+	if _, err := os.Stat(p); err == nil {
+		return LoadPath(p)
+	}
+	if migrated := migrateCwd(p); migrated {
+		return LoadPath(p)
+	}
+	return Default()
+}
+
+func migrateCwd(dest string) bool {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return false
+	}
+	old := filepath.Join(cwd, DefaultFile)
+	if old == dest {
+		return false
+	}
+	raw, err := os.ReadFile(old)
+	if err != nil || len(raw) == 0 {
+		return false
+	}
+	if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+		return false
+	}
+	if err := os.WriteFile(dest, raw, 0o600); err != nil {
+		return false
+	}
+	return true
 }
 
 // LoadPath reads path.
@@ -44,19 +83,27 @@ func LoadPath(path string) File {
 	return Normalize(f)
 }
 
-// Save writes DefaultFile.
+// Save writes Path(). An empty API key does not wipe a stored key.
 func Save(f File) error {
-	return SavePath(DefaultFile, f)
+	return SavePath(Path(), f)
 }
 
-// SavePath writes path.
+// SavePath writes path. Creates the parent dir. Does not replace a stored API key with empty.
 func SavePath(path string, f File) error {
 	f = Normalize(f)
+	if f.APIKey == "" {
+		if existing := LoadPath(path); existing.APIKey != "" {
+			f.APIKey = existing.APIKey
+		}
+	}
 	raw, err := json.MarshalIndent(f, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, append(raw, '\n'), 0o644)
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(path, append(raw, '\n'), 0o600)
 }
 
 // Normalize pins known aliases and forces rank to Argon for now.

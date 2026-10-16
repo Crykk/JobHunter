@@ -3,6 +3,7 @@ package tui
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -85,6 +86,65 @@ func TestLoadLastJSON(t *testing.T) {
 	}
 	if mm.why != "Go fit" {
 		t.Fatalf("why %q", mm.why)
+	}
+}
+
+func TestHomeInputYMatchesView(t *testing.T) {
+	m := newModel("dev", "x", "y")
+	m.width, m.height = 80, 24
+	lines := strings.Split(m.View(), "\n")
+	qy, ay := m.homeQueryY(), m.homeAreaY()
+	if qy < 0 || ay >= len(lines) {
+		t.Fatalf("input y query=%d area=%d lines=%d", qy, ay, len(lines))
+	}
+	if !strings.Contains(lines[qy], "query") {
+		t.Fatalf("query y=%d was %q", qy, lines[qy])
+	}
+	if !strings.Contains(lines[ay], "location") && !strings.Contains(lines[ay], "area") {
+		t.Fatalf("area y=%d was %q", ay, lines[ay])
+	}
+}
+
+func TestClickAreaFocusesAndTypes(t *testing.T) {
+	m := newModel("dev", "x", "y")
+	m.width, m.height = 80, 24
+	got, _ := m.Update(tea.MouseMsg{
+		X:      boxLeft + 4,
+		Y:      m.homeAreaY(),
+		Action: tea.MouseActionPress,
+		Button: tea.MouseButtonLeft,
+	})
+	mm := got.(model)
+	if mm.focus != focusArea {
+		t.Fatalf("focus %v", mm.focus)
+	}
+	got, _ = mm.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("Vantaa")})
+	mm = got.(model)
+	if mm.area.Value() != "Vantaa" {
+		t.Fatalf("area %q", mm.area.Value())
+	}
+	if mm.query.Value() != "" {
+		t.Fatalf("query leaked %q", mm.query.Value())
+	}
+}
+
+func TestClickQueryKeepsFocus(t *testing.T) {
+	m := newModel("dev", "x", "y")
+	m.width, m.height = 80, 24
+	got, _ := m.Update(tea.KeyMsg{Type: tea.KeyTab})
+	mm := got.(model)
+	if mm.focus != focusArea {
+		t.Fatalf("tab should move to area, got %v", mm.focus)
+	}
+	got, _ = mm.Update(tea.MouseMsg{
+		X:      boxLeft + 4,
+		Y:      mm.homeQueryY(),
+		Action: tea.MouseActionPress,
+		Button: tea.MouseButtonLeft,
+	})
+	mm = got.(model)
+	if mm.focus != focusQuery {
+		t.Fatalf("focus %v", mm.focus)
 	}
 }
 

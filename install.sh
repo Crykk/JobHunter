@@ -67,6 +67,7 @@ if download_release; then
     echo "archive did not contain ${BIN_NAME}" >&2
     exit 1
   fi
+  # Replace only the binary. Never overwrite profile.txt or jobhunter.settings.json.
   install -m 0755 "$src" "${INSTALL_DIR}/${BIN_NAME}"
   data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/jobhunter"
   mkdir -p "$data_dir"
@@ -74,6 +75,11 @@ if download_release; then
   if [ -n "$example" ] && [ ! -f "${data_dir}/profile.txt" ]; then
     cp "$example" "${data_dir}/profile.txt"
     echo "Created ${data_dir}/profile.txt — edit it in JobHunter Settings"
+  elif [ -f "${data_dir}/profile.txt" ]; then
+    echo "Kept existing ${data_dir}/profile.txt"
+  fi
+  if [ -f "${data_dir}/jobhunter.settings.json" ]; then
+    echo "Kept existing ${data_dir}/jobhunter.settings.json"
   fi
 else
   go_fallback

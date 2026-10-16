@@ -81,12 +81,54 @@ func TestResolveAPIKeyEnvWins(t *testing.T) {
 
 func TestResolveAPIKeyFromFile(t *testing.T) {
 	t.Setenv("OPENROUTER_API_KEY", "")
-	dir := t.TempDir()
-	t.Chdir(dir)
+	t.Setenv("JOBHUNTER_SETTINGS", "")
+	home := t.TempDir()
+	t.Setenv("JOBHUNTER_HOME", home)
+	t.Chdir(t.TempDir())
 	if err := Save(File{APIKey: "sk-from-file"}); err != nil {
 		t.Fatal(err)
 	}
 	if ResolveAPIKey() != "sk-from-file" {
 		t.Fatalf("%q", ResolveAPIKey())
+	}
+	if _, err := os.Stat(filepath.Join(home, DefaultFile)); err != nil {
+		t.Fatal("expected settings in app data dir")
+	}
+}
+
+func TestSaveDoesNotWipeAPIKey(t *testing.T) {
+	path := filepath.Join(t.TempDir(), DefaultFile)
+	if err := SavePath(path, File{FilterModel: "luna", APIKey: "sk-keep"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := SavePath(path, File{FilterModel: "jev"}); err != nil {
+		t.Fatal(err)
+	}
+	out := LoadPath(path)
+	if out.APIKey != "sk-keep" {
+		t.Fatalf("wiped key: %q", out.APIKey)
+	}
+	if out.FilterModel != openrouter.JevModel {
+		t.Fatalf("filter %s", out.FilterModel)
+	}
+}
+
+func TestLoadMigratesCwdSettings(t *testing.T) {
+	t.Setenv("OPENROUTER_API_KEY", "")
+	t.Setenv("JOBHUNTER_SETTINGS", "")
+	home := t.TempDir()
+	t.Setenv("JOBHUNTER_HOME", home)
+	cwd := t.TempDir()
+	t.Chdir(cwd)
+	old := filepath.Join(cwd, DefaultFile)
+	if err := os.WriteFile(old, []byte(`{"filter_model":"jev","api_key":"sk-old"}`+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got := Load()
+	if got.APIKey != "sk-old" || got.FilterModel != openrouter.JevModel {
+		t.Fatalf("%+v", got)
+	}
+	if _, err := os.Stat(filepath.Join(home, DefaultFile)); err != nil {
+		t.Fatal("expected migrated app-data file")
 	}
 }

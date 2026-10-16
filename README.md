@@ -20,7 +20,7 @@ macOS / Linux:
 curl -fsSL https://raw.githubusercontent.com/Crykk/JobHunter/main/install.sh | sh
 ```
 
-The scripts download the matching GitHub Release binary onto PATH (`%LOCALAPPDATA%\jobhunter` on Windows, `~/.local/bin` on Unix). Until a release exists, they fall back to `go install` when Go is on PATH.
+The scripts download the matching GitHub Release binary onto PATH (`%LOCALAPPDATA%\jobhunter` on Windows, `~/.local/bin` on Unix). Reinstall replaces only `jobhunter` / `jobhunter.exe`. Your API key, model choice, and `profile.txt` stay in the app data folder.
 
 Override the GitHub repo if you forked:
 
@@ -38,11 +38,11 @@ go install github.com/Crykk/JobHunter/cmd/jobhunter@latest
 
 1. On first run (and on Windows install) JobHunter creates `profile.txt` if it is missing: `%LOCALAPPDATA%\jobhunter\profile.txt` on Windows, `~/.local/share/jobhunter/profile.txt` on Unix. If `./profile.txt` already exists, that file is used instead. Open it from **Settings → Open in editor** (Notepad/default app) or **Open folder**.
 
-2. OpenRouter API key: type `jobhunter` and **paste the key** when asked (hidden). It is saved in `jobhunter.settings.json` (gitignored). Change it later under **Settings**. Optional: set `OPENROUTER_API_KEY` to override.
+2. OpenRouter API key: type `jobhunter` and **paste the key** when asked (hidden). It is saved in `%LOCALAPPDATA%\jobhunter\jobhunter.settings.json` on Windows or `~/.local/share/jobhunter/jobhunter.settings.json` on Unix (gitignored). Change it later under **Settings**. Optional: set `OPENROUTER_API_KEY` to override. A new install does not overwrite this file.
 
 ## Usage
 
-In Windows Terminal, PowerShell, or any TTY, type `jobhunter` (no flags). The UI stays in **that** tab: click **New search**, type a query, Enter. Click a result to open it in your default browser. **Settings** (`ctrl+,`) chooses the first-pass model (Luna 6 Decisions or Jev); the second pass is Gemini 4 Argon. `ctrl+q` quits. Choices are saved in `jobhunter.settings.json` (gitignored).
+In Windows Terminal, PowerShell, or any TTY, type `jobhunter` (no flags). The UI stays in **that** tab: click **New search**, type a query, Enter. Click a result to open it in your default browser. **Settings** (`ctrl+,`) chooses the first-pass model (Luna 6 Decisions or Jev); the second pass is Gemini 4 Argon. `ctrl+q` quits. Choices and the API key are saved in the app data `jobhunter.settings.json` (gitignored) and survive upgrades.
 
 Scripts and pipes still use the non-interactive command:
 

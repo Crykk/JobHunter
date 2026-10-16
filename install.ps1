@@ -39,12 +39,20 @@ try {
     Expand-Archive -Path $zip -DestinationPath $extract -Force
     $exe = Get-ChildItem -Path $extract -Recurse -Filter "jobhunter.exe" | Select-Object -First 1
     if (-not $exe) { throw "zip did not contain jobhunter.exe" }
+    # Replace only the binary. Never overwrite profile.txt or jobhunter.settings.json.
     Copy-Item $exe.FullName (Join-Path $InstallDir "jobhunter.exe") -Force
     $example = Get-ChildItem -Path $extract -Recurse -Filter "profile.example.txt" | Select-Object -First 1
     $profile = Join-Path $InstallDir "profile.txt"
     if ($example -and -not (Test-Path $profile)) {
         Copy-Item $example.FullName $profile
         Write-Host "Created $profile — edit it in JobHunter Settings"
+    }
+    elseif (Test-Path $profile) {
+        Write-Host "Kept existing $profile"
+    }
+    $settings = Join-Path $InstallDir "jobhunter.settings.json"
+    if (Test-Path $settings) {
+        Write-Host "Kept existing $settings"
     }
 }
 catch {

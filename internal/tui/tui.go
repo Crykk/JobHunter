@@ -123,10 +123,10 @@ func newModel(version, commit, date string) model {
 	q.Width = 36
 
 	a := textinput.New()
-	a.Placeholder = "area (optional)"
+	a.Placeholder = "location (optional, e.g. Vantaa)"
 	a.Prompt = "area "
 	a.CharLimit = 80
-	a.Width = 22
+	a.Width = 36
 
 	k := textinput.New()
 	k.Placeholder = "paste OpenRouter API key"
@@ -334,6 +334,14 @@ func (m model) handleMouse(msg tea.MouseMsg) (tea.Model, tea.Cmd) {
 
 	switch m.screen {
 	case screenHome:
+		if msg.X >= boxLeft {
+			switch msg.Y {
+			case m.homeQueryY():
+				return m.focusQuery()
+			case m.homeAreaY():
+				return m.focusArea()
+			}
+		}
 		if id, ok := m.menuAt(msg.X, msg.Y); ok {
 			m.menuCursor = indexOfMenu(id)
 			switch id {
@@ -496,6 +504,13 @@ func (m model) focusQuery() (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+func (m model) focusArea() (tea.Model, tea.Cmd) {
+	m.focus = focusArea
+	m.query.Blur()
+	cmd := m.area.Focus()
+	return m, cmd
+}
+
 func (m model) updateInputs(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.focus == focusQuery {
@@ -516,7 +531,7 @@ func (m *model) sizeInputs() {
 		qw = 40
 	}
 	m.query.Width = qw
-	m.area.Width = 18
+	m.area.Width = qw
 	aw := box - 8
 	if aw < 20 {
 		aw = 20
