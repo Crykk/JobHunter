@@ -40,6 +40,12 @@ try {
     $exe = Get-ChildItem -Path $extract -Recurse -Filter "jobhunter.exe" | Select-Object -First 1
     if (-not $exe) { throw "zip did not contain jobhunter.exe" }
     Copy-Item $exe.FullName (Join-Path $InstallDir "jobhunter.exe") -Force
+    $example = Get-ChildItem -Path $extract -Recurse -Filter "profile.example.txt" | Select-Object -First 1
+    $profile = Join-Path $InstallDir "profile.txt"
+    if ($example -and -not (Test-Path $profile)) {
+        Copy-Item $example.FullName $profile
+        Write-Host "Created $profile — edit it in JobHunter Settings"
+    }
 }
 catch {
     Write-Host $_.Exception.Message
@@ -56,4 +62,4 @@ if ($parts -notcontains $InstallDir) {
 }
 
 Write-Host "Installed $(Join-Path $InstallDir 'jobhunter.exe')"
-Write-Host 'Then run: jobhunter search --query "python" --area "Helsinki" --pages 3'
+Write-Host 'Then run: jobhunter   (same tab UI). Scripts: jobhunter search -q "python" -a "Helsinki"'

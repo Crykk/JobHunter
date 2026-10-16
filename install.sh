@@ -68,6 +68,13 @@ if download_release; then
     exit 1
   fi
   install -m 0755 "$src" "${INSTALL_DIR}/${BIN_NAME}"
+  data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/jobhunter"
+  mkdir -p "$data_dir"
+  example=$(find "$tmpdir" -type f -name "profile.example.txt" | head -n 1)
+  if [ -n "$example" ] && [ ! -f "${data_dir}/profile.txt" ]; then
+    cp "$example" "${data_dir}/profile.txt"
+    echo "Created ${data_dir}/profile.txt — edit it in JobHunter Settings"
+  fi
 else
   go_fallback
 fi
@@ -80,4 +87,4 @@ case ":$PATH:" in
     echo "  export PATH=\"${INSTALL_DIR}:\$PATH\""
     ;;
 esac
-echo "Then run: jobhunter search --query \"python\" --area \"Helsinki\" --pages 3"
+echo "Then run: jobhunter   (same-tab UI). Scripts: jobhunter search -q python -a Helsinki"

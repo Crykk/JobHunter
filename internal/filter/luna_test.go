@@ -48,6 +48,18 @@ func TestApplyThreshold(t *testing.T) {
 	}
 }
 
+func TestApplyJevModel(t *testing.T) {
+	dec := &fakeDecider{noul: map[string]float64{"1": 0.9}}
+	fl := &Filter{OR: dec, Model: openrouter.JevModel, Threshold: 0.5}
+	_, _, err := fl.Apply(context.Background(), "p", []job.Card{{ID: "1", Title: "T"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dec.got.Model != openrouter.JevModel {
+		t.Fatalf("model %s", dec.got.Model)
+	}
+}
+
 func TestApplyBatches(t *testing.T) {
 	old := MaxQuestions
 	t.Cleanup(func() { /* const: exercise full path with 2 cards */ })

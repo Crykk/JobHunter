@@ -22,6 +22,7 @@ type Client interface {
 // Filter keeps cards whose noul score is >= threshold.
 type Filter struct {
 	OR        Client
+	Model     string
 	Threshold float64
 	Log       io.Writer
 }
@@ -62,7 +63,11 @@ func (f *Filter) Apply(ctx context.Context, profile string, cards []job.Card) ([
 			end = len(cards)
 		}
 		batch := cards[start:end]
-		f.logf("luna: scoring jobs %d–%d of %d (threshold %.2f)", start+1, end, len(cards), thr)
+		model := f.Model
+		if model == "" {
+			model = openrouter.LunaModel
+		}
+		f.logf("%s: scoring jobs %d–%d of %d (threshold %.2f)", logName(model), start+1, end, len(cards), thr)
 
 		state := lunaState{Profile: profile}
 		questions := make(map[string]openrouter.NoulQuestion, len(batch))
@@ -81,7 +86,7 @@ func (f *Filter) Apply(ctx context.Context, profile string, cards []job.Card) ([
 		}
 
 		resp, err := f.OR.Decide(ctx, openrouter.DecisionsRequest{
-			Model:     openrouter.LunaModel,
+			Model:     model,
 			State:     state,
 			Questions: questions,
 		})
@@ -91,7 +96,7 @@ func (f *Filter) Apply(ctx context.Context, profile string, cards []job.Card) ([
 		for _, c := range batch {
 			ans, ok := resp.Answers["suitable_"+c.ID]
 			if !ok {
-				f.logf("luna: no answer for %s; dropping", c.ID)
+				f.logf("%s: no answer for %s; dropping", logName(model), c.ID)
 				continue
 			}
 			scores[c.ID] = ans.Noul
@@ -100,6 +105,13 @@ func (f *Filter) Apply(ctx context.Context, profile string, cards []job.Card) ([
 			}
 		}
 	}
-	f.logf("luna: kept %d of %d", len(kept), len(cards))
+	f.logf("%s: kept %d of %d", logName(f.Model), len(kept), len(cards))
 	return kept, scores, nil
+}
+
+func logName(model string) string {
+	if model == openrouter.JevModel {
+		return "jev"
+	}
+	return "luna"
 }

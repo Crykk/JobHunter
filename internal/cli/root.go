@@ -6,6 +6,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
+
+	"github.com/Crykk/JobHunter/internal/tui"
 )
 
 // Execute runs the jobhunter cobra command.
@@ -14,10 +17,18 @@ func Execute(version, commit, date string) error {
 	return root.Execute()
 }
 
+func writerIsTTY(w io.Writer) bool {
+	f, ok := w.(*os.File)
+	if !ok {
+		return false
+	}
+	return term.IsTerminal(int(f.Fd()))
+}
+
 func newRoot(version, commit, date string, stdout, stderr io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "jobhunter",
-		Short:         "Filter Duunitori listings with Luna Decisions, then rank with Gemini 4 Argon",
+		Short:         "Terminal UI for Duunitori search (Luna + Argon). Use `search` for scripts.",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -37,6 +48,9 @@ func newRoot(version, commit, date string, stdout, stderr io.Writer) *cobra.Comm
 		if v {
 			fmt.Fprintf(c.OutOrStdout(), "jobhunter %s (commit %s, built %s)\n", version, commit, date)
 			return nil
+		}
+		if len(args) == 0 && writerIsTTY(stdout) {
+			return tui.Run(version, commit, date)
 		}
 		return c.Help()
 	}

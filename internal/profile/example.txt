@@ -1,0 +1,10 @@
+Name: Alex Virtanen
+Target roles: backend or full-stack engineer, Python or Go
+Seniority: mid-level (3–6 years)
+Location: Helsinki metro, hybrid preferred, remote in Finland OK
+Must-have skills: Python or Go, REST APIs, SQL
+Nice-to-have: Kubernetes, Terraform, TypeScript
+Deal-breakers: 100% on-site outside Uusimaa, unpaid internships, pure sales/SDR, crypto trading desks
+Languages: Finnish (native), English (fluent)
+Work authorization: EU citizen
+Notes: Prefer product companies and consultancies with engineering culture. Open to contractor roles of 6+ months.

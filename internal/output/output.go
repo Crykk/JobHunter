@@ -12,6 +12,9 @@ import (
 	"github.com/Crykk/JobHunter/internal/job"
 )
 
+// DefaultJSON is the default --out path.
+const DefaultJSON = "output/matches.json"
+
 // Table writes a ranked table to stdout.
 func Table(w io.Writer, matches []job.Match) error {
 	if len(matches) == 0 {
@@ -37,6 +40,25 @@ func JSONFile(path string, file job.ResultFile) error {
 		return err
 	}
 	return os.WriteFile(path, append(raw, '\n'), 0o644)
+}
+
+// LoadJSON reads a ResultFile written by JSONFile.
+func LoadJSON(path string) (job.ResultFile, error) {
+	if strings.TrimSpace(path) == "" {
+		path = DefaultJSON
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return job.ResultFile{}, err
+	}
+	var file job.ResultFile
+	if err := json.Unmarshal(raw, &file); err != nil {
+		return job.ResultFile{}, fmt.Errorf("parse %s: %w", path, err)
+	}
+	if file.Matches == nil {
+		file.Matches = []job.Match{}
+	}
+	return file, nil
 }
 
 func clip(s string, n int) string {

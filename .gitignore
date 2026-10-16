@@ -3,6 +3,7 @@
 /dist/
 /output/
 profile.txt
+jobhunter.settings.json
 .env
 *.exe
 coverage.out

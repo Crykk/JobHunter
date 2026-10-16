@@ -27,6 +27,19 @@ func TestSearchRequiresQuery(t *testing.T) {
 	}
 }
 
+func TestRootNoArgsHelpWhenNotTTY(t *testing.T) {
+	out, errBuf := &bytes.Buffer{}, &bytes.Buffer{}
+	cmd := newRoot("1.0.0", "abc", "today", out, errBuf)
+	cmd.SetArgs([]string{})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	s := out.String()
+	if !strings.Contains(s, "jobhunter") {
+		t.Fatalf("help %s", s)
+	}
+}
+
 func TestVersion(t *testing.T) {
 	out, errBuf := &bytes.Buffer{}, &bytes.Buffer{}
 	cmd := newRoot("9.9.9", "deadbeef", "now", out, errBuf)

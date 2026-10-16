@@ -18,8 +18,9 @@ type Chatter interface {
 
 // Ranker scores surviving job details with Gemini 4 Argon.
 type Ranker struct {
-	OR  Chatter
-	Log io.Writer
+	OR    Chatter
+	Model string
+	Log   io.Writer
 }
 
 const systemPrompt = `You rank Finnish job ads against a candidate profile.
@@ -45,6 +46,10 @@ func (r *Ranker) Rank(ctx context.Context, profile string, details []job.Detail)
 	if len(details) == 0 {
 		return nil, nil
 	}
+	model := r.Model
+	if model == "" {
+		model = openrouter.ArgonModel
+	}
 	r.logf("argon: ranking %d jobs", len(details))
 	user, err := json.Marshal(map[string]any{
 		"profile": profile,
@@ -53,7 +58,7 @@ func (r *Ranker) Rank(ctx context.Context, profile string, details []job.Detail)
 	if err != nil {
 		return nil, err
 	}
-	raw, err := r.OR.ChatJSON(ctx, openrouter.ArgonModel, systemPrompt, string(user))
+	raw, err := r.OR.ChatJSON(ctx, model, systemPrompt, string(user))
 	if err != nil {
 		return nil, err
 	}

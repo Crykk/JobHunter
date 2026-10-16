@@ -16,6 +16,7 @@ const (
 	DecisionsPath       = "/api/alpha/decisions"
 	ChatCompletionsPath = "/api/v1/chat/completions"
 	LunaModel           = "openai/gpt-6-luna-decisions"
+	JevModel            = "typesafe/jev-1.14"
 	ArgonModel          = "google/gemini-4-argon"
 )
 
