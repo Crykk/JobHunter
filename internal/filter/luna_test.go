@@ -2,6 +2,7 @@ package filter
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/Crykk/JobHunter/internal/job"
@@ -43,8 +44,12 @@ func TestApplyThreshold(t *testing.T) {
 	if dec.got.Model != openrouter.LunaModel {
 		t.Fatalf("model %s", dec.got.Model)
 	}
-	if _, ok := dec.got.Questions["suitable_1"]; !ok {
+	q, ok := dec.got.Questions["suitable_1"]
+	if !ok {
 		t.Fatal("expected suitable_{id} questions")
+	}
+	if !strings.Contains(q.Instructions, "job id 1") {
+		t.Fatalf("instructions should name the job: %s", q.Instructions)
 	}
 }
 
@@ -73,6 +78,94 @@ func TestApplyBatches(t *testing.T) {
 	if err != nil || len(kept) != 2 {
 		t.Fatalf("kept %v err %v", kept, err)
 	}
+}
+
+type refuseOnce struct {
+	refuseID string
+	noul     map[string]float64
+	calls    int
+	last     openrouter.DecisionsRequest
+}
+
+func (f *refuseOnce) Decide(_ context.Context, req openrouter.DecisionsRequest) (*openrouter.DecisionsResponse, error) {
+	f.calls++
+	f.last = req
+	if f.calls == 1 {
+		return nil, &openrouter.APIError{
+			Status:  502,
+			Message: `Provider returned error: openai refused to answer question "suitable_` + f.refuseID + `"`,
+		}
+	}
+	out := &openrouter.DecisionsResponse{Answers: map[string]openrouter.NoulAnswer{}}
+	for id := range req.Questions {
+		jobID := strings.TrimPrefix(id, "suitable_")
+		n := f.noul[jobID]
+		if n == 0 {
+			n = 0.9
+		}
+		out.Answers[id] = openrouter.NoulAnswer{Type: "noul", Noul: n}
+	}
+	return out, nil
+}
+
+func TestDropRefusedQuestionKeepsOthers(t *testing.T) {
+	cards := []job.Card{
+		{ID: "20531918", Title: "X"},
+		{ID: "2", Title: "Go engineer"},
+	}
+	dec := &refuseOnce{refuseID: "20531918", noul: map[string]float64{"2": 0.9}}
+	fl := &Filter{OR: dec, Threshold: 0.55}
+	kept, _, err := fl.Apply(context.Background(), "go", cards)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dec.calls < 2 {
+		t.Fatalf("expected retry after drop, calls=%d", dec.calls)
+	}
+	if len(kept) != 1 || kept[0].ID != "2" {
+		t.Fatalf("kept %+v", kept)
+	}
+	if _, ok := dec.last.Questions["suitable_20531918"]; ok {
+		t.Fatal("refused id should not be retried")
+	}
+}
+
+type always502 struct{ calls int }
+
+func (a *always502) Decide(_ context.Context, req openrouter.DecisionsRequest) (*openrouter.DecisionsResponse, error) {
+	a.calls++
+	return nil, &openrouter.APIError{Status: 502, Message: "invalid response from model"}
+}
+
+func TestGeneric502DropsSinglesNotWholeSearch(t *testing.T) {
+	cards := []job.Card{{ID: "a", Title: "A"}, {ID: "b", Title: "B"}}
+	dec := &always502{}
+	fl := &Filter{OR: dec, Threshold: 0.5}
+	kept, _, err := fl.Apply(context.Background(), "p", cards)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(kept) != 0 {
+		t.Fatalf("kept %+v", kept)
+	}
+	if dec.calls < 3 {
+		t.Fatalf("expected split retries, calls=%d", dec.calls)
+	}
+}
+
+func TestFatalErrorStops(t *testing.T) {
+	dec := &fatalDecider{}
+	fl := &Filter{OR: dec, Threshold: 0.5}
+	_, _, err := fl.Apply(context.Background(), "p", []job.Card{{ID: "1", Title: "T"}})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+type fatalDecider struct{}
+
+func (fatalDecider) Decide(_ context.Context, _ openrouter.DecisionsRequest) (*openrouter.DecisionsResponse, error) {
+	return nil, &openrouter.APIError{Status: 401, Message: "invalid key"}
 }
 
 func TestMissingAnswerDropped(t *testing.T) {

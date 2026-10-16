@@ -90,3 +90,23 @@ func TestMissingKey(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestRefusedQuestionKeys(t *testing.T) {
+	err := &APIError{Status: 502, Message: `openai refused to answer question "suitable_20531918"`}
+	got := RefusedQuestionKeys(err)
+	if len(got) != 1 || got[0] != "suitable_20531918" {
+		t.Fatalf("%v", got)
+	}
+	if RefusedQuestionKeys(&APIError{Status: 502, Message: "invalid response"}) != nil {
+		t.Fatal("expected no keys")
+	}
+}
+
+func TestRetryable(t *testing.T) {
+	if !Retryable(&APIError{Status: 502, Message: "x"}) {
+		t.Fatal("502")
+	}
+	if Retryable(&APIError{Status: 401, Message: "x"}) {
+		t.Fatal("401")
+	}
+}

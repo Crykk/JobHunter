@@ -68,7 +68,7 @@ Progress goes to stderr. A ranked table is printed on stdout. JSON is written to
 Pipeline:
 
 1. `GET https://duunitori.fi/tyopaikat?haku=...&alue=...&sivu=N` — parse list cards only (id, title, company, location, posted, url). Dedup by numeric id from `/tyopaikat/tyo/{slug}-{id}`. Stop on last page (`ceil(total/20)`) or HTTP 404.
-2. Stage 1 — `POST https://openrouter.ai/api/alpha/decisions` with `openai/gpt-6-luna-decisions` or `typesafe/jev-1.14` (Settings). One `noul` question per job (`suitable_{id}`).
+2. Stage 1 — `POST https://openrouter.ai/api/alpha/decisions` with `openai/gpt-6-luna-decisions` or `typesafe/jev-1.14` (Settings). One `noul` question per job (`suitable_{id}`), named in the instructions. If Luna refuses one id (HTTP 502), that listing is dropped and the rest continue.
 3. Fetch detail pages for surviving IDs; strip HTML to text.
 4. Stage 2 — `POST https://openrouter.ai/api/v1/chat/completions` with model `google/gemini-4-argon`. JSON ranking (`score` 0–100 + `why`).
 

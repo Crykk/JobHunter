@@ -38,7 +38,7 @@ This Project also has a private Origin copy; GitHub is the public home.
 | `internal/scraper` | Search pagination (`sivu=`, 20/page) and detail fetch |
 | `internal/parse` | goquery list cards + detail text; Cloudflare HTML detection |
 | `internal/openrouter` | Decisions + chat HTTP |
-| `internal/filter` | Luna: `state` = profile + jobs; one `noul` per job `suitable_{id}`; keep if `noul >= --threshold` (default 0.55); batch ≤ ~100 jobs |
+| `internal/filter` | Luna/Jev: `state` = profile + jobs; one `noul` per job `suitable_{id}` with that id in the instructions; keep if `noul >= --threshold` (default 0.55); batch ≤ 25. On Luna 502/refusal, drop that id or split the batch — do not abort the search |
 | `internal/rank` | Argon JSON: `score` 0–100 and short `why` |
 | `internal/output` | stderr progress, stdout table, `--out` JSON (default `output/matches.json`) |
 | `install.ps1` / `install.sh` | Release asset, else `go install` |

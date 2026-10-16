@@ -28,6 +28,25 @@ func TestParseDetailJSONLD(t *testing.T) {
 	}
 }
 
+func TestParseDetailPrefersH1OverJSONLDCategory(t *testing.T) {
+	d, err := ParseDetail(testdata("detail_category_title.html"), "https://duunitori.fi/tyopaikat/tyo/hsl-data-analyytikko-sdsuu-20638375")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if d.Title != "Data-analyytikko, tukianalytiikan lead" {
+		t.Fatalf("title %q (JSON-LD category must not win)", d.Title)
+	}
+	if d.Company != "HSL Helsingin seudun liikenne -kuntayhtymä" {
+		t.Fatalf("company %q", d.Company)
+	}
+	if d.Location != "Helsinki" {
+		t.Fatalf("location %q", d.Location)
+	}
+	if !strings.Contains(d.Description, "analytics") {
+		t.Fatalf("description %q", d.Description)
+	}
+}
+
 func TestLooksLikeCloudflare(t *testing.T) {
 	body := testdata("cloudflare.html")
 	h := http.Header{}

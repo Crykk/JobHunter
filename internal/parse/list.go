@@ -74,8 +74,8 @@ func ParseList(html []byte, pageURL string) (*ListPage, error) {
 			if title == "" {
 				return
 			}
-			company := strings.TrimSpace(s.AttrOr("data-company", ""))
-			loc := nearbyText(s, ".job-box__job-location, .job-card__location, [class*='location']")
+			company := attrCompany(s)
+			loc := cleanLocation(nearbyText(s, ".job-box__job-location, .job-card__location, [class*='location']"))
 			posted := nearbyPosted(s)
 			seen[id] = struct{}{}
 			out.Cards = append(out.Cards, job.Card{
@@ -131,11 +131,11 @@ func cardFromBox(s *goquery.Selection, base *url.URL) (job.Card, bool) {
 	if title == "" {
 		title = strings.TrimSpace(link.Text())
 	}
-	company := strings.TrimSpace(s.Find(".job-box__company, .job-card__company, [class*='company']").First().Text())
+	company := strings.TrimSpace(s.Find(".job-box__company, .job-card__company").First().Text())
 	if company == "" {
-		company = strings.TrimSpace(s.AttrOr("data-company", ""))
+		company = attrCompany(s)
 	}
-	location := strings.TrimSpace(s.Find(".job-box__job-location, .job-card__location, [class*='location']").First().Text())
+	location := cleanLocation(s.Find(".job-box__job-location, .job-card__location, [class*='location']").First().Text())
 	posted := strings.TrimSpace(s.Find(".job-box__job-posted, time, [class*='posted']").First().Text())
 	if posted == "" {
 		if m := postedRe.FindStringSubmatch(s.Text()); len(m) == 2 {
@@ -223,6 +223,24 @@ func nearbyPosted(s *goquery.Selection) string {
 
 func collapseSpace(s string) string {
 	return strings.Join(strings.Fields(s), " ")
+}
+
+// attrCompany reads data-company from the node or a descendant (live cards put it on the hover link).
+func attrCompany(s *goquery.Selection) string {
+	if v := strings.TrimSpace(s.AttrOr("data-company", "")); v != "" {
+		return collapseSpace(v)
+	}
+	if v := strings.TrimSpace(s.Find("[data-company]").First().AttrOr("data-company", "")); v != "" {
+		return collapseSpace(v)
+	}
+	return ""
+}
+
+// cleanLocation strips trailing "Helsinki –" dashes left when work-mode text is empty.
+func cleanLocation(s string) string {
+	s = collapseSpace(s)
+	s = strings.TrimRight(s, " \t-–—")
+	return strings.TrimSpace(s)
 }
 
 // LastPageFromTotal is ceil(total/20).

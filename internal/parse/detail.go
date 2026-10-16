@@ -47,10 +47,10 @@ func ParseDetail(html []byte, pageURL string) (*job.Detail, error) {
 		d.URL = pageURL
 	}
 
+	// Visible heading is the real job title. JSON-LD title is often a category
+	// ("Data Science") and must not overwrite it.
+	d.Title = collapseSpace(doc.Find("h1, .job-header__title, .gtm-job-title").First().Text())
 	applyJSONLD(doc, d)
-	if d.Title == "" {
-		d.Title = collapseSpace(doc.Find("h1, .job-header__title, .gtm-job-title").First().Text())
-	}
 	if d.Company == "" {
 		d.Company = collapseSpace(doc.Find(".job-header__company, .gtm-employer-name, a[href*='/yritys/']").First().Text())
 	}
@@ -72,7 +72,7 @@ func ParseDetail(html []byte, pageURL string) (*job.Detail, error) {
 
 	d.Title = collapseSpace(d.Title)
 	d.Company = collapseSpace(d.Company)
-	d.Location = collapseSpace(d.Location)
+	d.Location = cleanLocation(d.Location)
 	d.Description = collapseSpace(stripHTML(d.Description))
 	return d, nil
 }
